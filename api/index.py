@@ -83,7 +83,7 @@ def handle_message(event):
             reply_msg = reply_msg.replace("AI:", "", 1)
             chatgpt.add_msg(f"AI:{reply_msg}")
 
-        print(f"{reply_msg=}")
+        print(f"{chatgpt.prompt.msg_list=}")
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=reply_msg))
