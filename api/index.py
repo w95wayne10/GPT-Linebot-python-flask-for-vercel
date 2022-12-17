@@ -67,13 +67,13 @@ def handle_message(event):
             reply_msg = reply_msg.replace("AI:", "", 1)
             prompt_temp = chatgpt.prompt
             stop_condition = finish_reason=="stop"
-            print(f"{chatgpt.prompt=}")
+            print(f"{chatgpt.prompt.msg_list=}")
             while not stop_condition:
                 chatgpt.clean_msg()
                 chatgpt.add_msg(f"HUMAN:{event.message.text}?")
                 chatgpt.add_msg(f"AI:{reply_msg}")
                 reply_msg_part, finish_reason = chatgpt.get_response()
-                print(f"{chatgpt.prompt=}")
+                print(f"{chatgpt.prompt.msg_list=}")
                 stop_condition = finish_reason=="stop"
                 reply_msg+=reply_msg_part
             chatgpt.prompt = prompt_temp
