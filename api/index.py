@@ -58,34 +58,29 @@ def handle_message(event):
         return
 
     if working_status:
-        chatgpt.add_msg(f"HUMAN:{event.message.text}?\n")
+        chatgpt.add_msg(f"HUMAN:{event.message.text}?")
 
         # if part deal with word count limit case, else part deal with remain case
         if token_fillup and bool(re.search("(\d+字)|(字數.*\d+)",event.message.text)):
-            #line_bot_api.reply_message(
-            #    event.reply_token,
-            #    TextSendMessage(text="為完整呈現訊息，串接訊息會有較久的等待時間。請稍候..."))
             reply_msg, finish_reason = chatgpt.get_response()
             print(f"{reply_msg=}")
             reply_msg = reply_msg.replace("AI:", "", 1)
+            prompt_temp = chatgpt.prompt
             stop_condition = finish_reason=="stop"
-            chatgpt.add_msg(f"AI:{reply_msg}")
             while not stop_condition:
-            #    print("in while loop")
-            #    print(reply_msg)
-            #    line_bot_api.reply_message(
-            #        event.reply_token,
-            #        TextSendMessage(text="..."))
+                chatgpt.clean_msg()
+                chatgpt.add_msg(f"HUMAN:{event.message.text}?")
+                chatgpt.add_msg(f"AI:{reply_msg}")
                 reply_msg_part, finish_reason = chatgpt.get_response()
                 print(f"{reply_msg_part=}")
                 stop_condition = finish_reason=="stop"
-                chatgpt.add_msg(f"{reply_msg_part}")
                 reply_msg+=reply_msg_part
-            chatgpt.add_msg(f"\n")
+            chatgpt.prompt = prompt_temp
+            chatgpt.add_msg(f"AI:{reply_msg}")
         else:
             reply_msg, _ = chatgpt.get_response()
             reply_msg = reply_msg.replace("AI:", "", 1)
-            chatgpt.add_msg(f"AI:{reply_msg}\n")
+            chatgpt.add_msg(f"AI:{reply_msg}")
 
         print(f"{reply_msg=}")
         line_bot_api.reply_message(
